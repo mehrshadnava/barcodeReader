@@ -48,6 +48,44 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
+// Route to update a product by its ID
+app.put('/api/products/:id', async (req, res) => {
+  const { title, description, category, manufacturer, brand, ingredients, images, quantity, price } = req.body;
+
+  try {
+    const updatedProduct = await Product.findByIdAndUpdate(
+      req.params.id,
+      { title, description, category, manufacturer, brand, ingredients, images, quantity, price },
+      { new: true } // Return the updated product
+    );
+
+    if (!updatedProduct) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    res.json(updatedProduct); // Send the updated product back
+  } catch (error) {
+    console.error('Error updating product:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+// Route to delete a product by its ID
+app.delete('/api/products/:id', async (req, res) => {
+  try {
+    const product = await Product.findByIdAndDelete(req.params.id); // Find and delete product by ID
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    res.json({ message: 'Product deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
 // Route to add a product (POST)
 app.post('/api/products', async (req, res) => {
   const { barcode } = req.body; // Assume barcode data is sent in the request body
